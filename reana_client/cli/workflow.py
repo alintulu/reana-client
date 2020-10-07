@@ -43,6 +43,8 @@ from reana_commons.errors import REANAValidationError
 from reana_commons.operational_options import validate_operational_options
 from reana_commons.utils import click_table_printer
 
+#logging.basicConfig(filename="/home/alintulu/yadage_restart.txt",level=logging.DEBUG)
+#logging.basicConfig(filename="/home/alintulu/restart_debug.txt")
 
 @click.group(help="Workflow management commands")
 @click.pass_context
@@ -156,6 +158,9 @@ def workflow_workflows(
             page=page,
             size=size,
         )
+
+        logging.debug(response)
+
         verbose_headers = ["id", "user", "size"]
         headers = {
             "batch": ["name", "run_number", "created", "started", "ended", "status"],
@@ -513,6 +518,9 @@ def workflow_restart(
         parsed_parameters["reana_specification"] = load_reana_spec(
             click.format_filename(file)
         )
+
+        logging.debug(parsed_parameters)
+
     if workflow:
         if parameters or options:
             try:
@@ -549,6 +557,7 @@ def workflow_restart(
         try:
             logging.info("Connecting to {0}".format(get_api_url()))
             response = start_workflow(workflow, access_token, parsed_parameters)
+            logging.debug(workflow)
             workflow = response["workflow_name"] + "." + str(response["run_number"])
             current_status = get_workflow_status(workflow, access_token).get("status")
             click.secho(
