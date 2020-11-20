@@ -197,9 +197,20 @@ def download_files(
         logging.debug("{param}: {value}".format(param=p, value=ctx.params[p]))
 
     if not filenames:
-        reana_spec = get_workflow_specification(workflow, access_token)["specification"]
-        if "outputs" in reana_spec:
-            filenames = reana_spec["outputs"].get("files") or []
+        try:
+            reana_spec = get_workflow_specification(workflow, access_token)[
+                "specification"
+            ]
+            if "outputs" in reana_spec:
+                filenames = reana_spec["outputs"].get("files") or []
+        except Exception as e:
+            click.echo(
+                click.style(
+                    "Something went wrong while downloading.\n{0}".format(str(e)),
+                    fg="red",
+                ),
+                err=True,
+            )
 
     if workflow:
         for file_name in filenames:
@@ -273,17 +284,28 @@ def upload_files(ctx, workflow, filenames, access_token):  # noqa: D301
     for p in ctx.params:
         logging.debug("{param}: {value}".format(param=p, value=ctx.params[p]))
     if not filenames:
-        reana_spec = get_workflow_specification(workflow, access_token)["specification"]
-        if "inputs" in reana_spec:
-            filenames = []
-            filenames += [
-                os.path.join(os.getcwd(), f)
-                for f in reana_spec["inputs"].get("files") or []
+        try:
+            reana_spec = get_workflow_specification(workflow, access_token)[
+                "specification"
             ]
-            filenames += [
-                os.path.join(os.getcwd(), d)
-                for d in reana_spec["inputs"].get("directories") or []
-            ]
+            if "inputs" in reana_spec:
+                filenames = []
+                filenames += [
+                    os.path.join(os.getcwd(), f)
+                    for f in reana_spec["inputs"].get("files") or []
+                ]
+                filenames += [
+                    os.path.join(os.getcwd(), d)
+                    for d in reana_spec["inputs"].get("directories") or []
+                ]
+        except Exception as e:
+            click.echo(
+                click.style(
+                    "Something went wrong while uploading.\n{0}".format(str(e)),
+                    fg="red",
+                ),
+                err=True,
+            )
 
     if workflow:
         if filenames:

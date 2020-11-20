@@ -392,7 +392,7 @@ def download_file(workflow_id, file_name, access_token):
             return http_response.content
         else:
             raise Exception(
-                "Error {status_code} {reason} {message}".format(
+                "Error {status_code} {reason}\n{message}".format(
                     status_code=http_response.status_code,
                     reason=http_response.reason,
                     message=http_response.json().get("message"),
